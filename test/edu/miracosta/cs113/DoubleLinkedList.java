@@ -7,23 +7,46 @@ public class DoubleLinkedList<E> extends AbstractSequentialList<E>
     	private Node<E> tail = null;   //points to the tail of the list
     	private int size = 0;    // the number of items in the list
   
-  public void add(int index, E obj)
-  { // Fill Here 
+  public void add(int index, E obj) {
+	  ListIterator<E> iter = listIterator(index);
+	  iter.add(obj);
+	  
    }
-  public void addFirst(E obj) { // Fill Here 
+  public void addFirst(E obj) { 
+	  add(0, obj);
 	  
   }
-  public void addLast(E obj) { // Fill Here
+  public void addLast(E obj) { 
+	  add(size, obj);
   }
 
-  public E get(int index) 
-  { 	ListIterator<E> iter = listIterator(index); 
-      	return iter.next();
+  public E get(int index) { 	
+	  ListIterator<E> iter = listIterator(index); 
+      return iter.next();
   }  
-  public E getFirst() { return head.data;  }
-  public E getLast() { return tail.data;  }
+  public E getFirst() { 
+	  return head.data;  
+  }
+  public E getLast() { 
+	  return tail.data;  
+  }
 
-  public int size() {  return -1;  } // Fill Here
+  public int size() {  
+	  if (head == null)
+		  return 0;
+
+	  int count = 1;
+	  
+	  Node current = head;
+	  
+	  while (current.next != null) {
+		  count++;
+		  current = current.next;
+	  }
+	  
+	  return count;
+	  
+  } // Fill Here
 
   public E remove(int index)
   {     E returnValue = null;
@@ -71,30 +94,115 @@ public class DoubleLinkedList<E> extends AbstractSequentialList<E>
         }// end else
     }  // end constructor
 
-    public ListIter(ListIter other)
-    {   nextItem = other.nextItem;
-        index = other.index;    }
-
-    public boolean hasNext() {   return true;    } // Fill Here
-    public boolean hasPrevious()
-    {   return false;   } // Fill Here
-    public int previousIndex() {  return 0;    } // Fill Here
-    public int nextIndex() {  return 0;    } // Fill here
-    public void set(E o)  { }  // not implemented
-    public void remove(){}      // not implemented
-
-    public E next()
-    {  
-        return lastItemReturned.data; // Fill Here 
+    public ListIter(ListIter other) {   
+    	nextItem = other.nextItem;
+        index = other.index;    
     }
 
-    public E previous() 
-    {  return lastItemReturned.data; // Fill Here 
+    public boolean hasNext() {   
+    	    return nextItem != null;
+    } 
+    
+    public boolean hasPrevious() {   
+    	return (nextItem == null && size != 0)
+    			|| nextItem.prev != null;
+    } 
+    
+    public int previousIndex() {  
+    	if (!hasPrevious())
+    		return -1;
+    	else 
+    		return index;
+    } 
+    
+    public int nextIndex() {  
+    	if (!hasNext())
+    		return size;
+    	else
+    		return index;
+    	
+    } 
+    
+    public void set(E o)  { 
+    	
+    }  // not implemented
+    
+    public void remove(){
+    	
+    }      // not implemented
+
+    public E next() {  
+    	
+    	if (!hasNext())
+    		throw new NoSuchElementException();
+    	lastItemReturned = nextItem;
+    	
+    	nextItem = nextItem.next;
+    	
+    	index++;
+    	
+        return lastItemReturned.data; 
+    }
+
+    public E previous() {  
+    	if (!hasPrevious()) 
+    		throw new NoSuchElementException();
+    	
+    	if (nextItem == null)
+    		nextItem = tail;
+    	else
+    		nextItem = nextItem.prev;
+    	
+    	lastItemReturned = nextItem;
+    	
+    	index--;
+    	
+    	return lastItemReturned.data;  
     }
 
     public void add(E obj) {
-
-    // Fill Here
+    	/* 
+    	 * When adding, there are four cases to address:
+    	 * 		–Add to an empty list
+    	 * 		–Add to the head of the list
+    	 * 		–Add to the tail of the list
+    	 * 		–Add to the middle of the list
+    	 */
+    	
+    	//add to an empty list
+    	if (head == null) {
+    		head = new Node<E> (obj);
+    	}
+    	
+    	//adding to the head of the list
+    	if (nextItem == head) {
+    		Node<E> newNode = new Node<E>(obj);
+    		newNode.next = nextItem;
+    		nextItem.prev = newNode;
+    		head = newNode;
+    	}
+    	
+    	//adding to the tail of the list
+    	else if (nextItem == null) {
+    		Node<E> newNode = new Node<E>(obj);
+    		tail.next = newNode;
+    		newNode.prev = tail;
+    		tail = newNode;
+    	}
+    	
+    	//adding to the middle of the list
+    	else {
+    		Node <E> newNode = new Node<E>(obj);
+    		newNode.prev = nextItem.prev;
+    		nextItem.prev.next = newNode;
+    		newNode.next = nextItem;
+    		nextItem.prev = newNode;
+    				
+    	}
+    	
+    	size++;
+    	index++;
+    	lastItemReturned = null;
     }
   }// end of inner class ListIter
 }// end of class DoubleLinkedList
